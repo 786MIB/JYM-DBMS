@@ -1,0 +1,43 @@
+{
+  "entities": {
+    "User": {
+      "title": "User Profile",
+      "description": "Information about a registered Madrasah staff or administrator user account.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "description": "Unique user ID" },
+        "email": { "type": "string", "description": "User email address in lowercase" },
+        "fullName": { "type": "string", "description": "User profile screen name" },
+        "role": { "type": "string", "enum": ["Admin", "Teacher", "Finance", "Registrar", "Guest"], "description": "Assigned staff role" },
+        "provider": { "type": "string", "enum": ["local", "google", "microsoft"], "description": "Authentication provider" },
+        "password": { "type": "string", "description": "Plain text or hashed authentication password" }
+      },
+      "required": ["id", "email", "fullName", "role", "provider"]
+    },
+    "SchoolState": {
+      "title": "School Database State",
+      "description": "Unified system database containing all active students, attendance logs, billing resources, and curriculums.",
+      "type": "object",
+      "properties": {
+        "students": { "type": "array", "description": "List of student profile records" },
+        "studentAttendance": { "type": "array", "description": "List of student daily checkins" },
+        "feeRecords": { "type": "array", "description": "List of tuition invoices and financial receipts" },
+        "teacherAttendance": { "type": "array", "description": "List of teacher checkins" },
+        "topicCoverage": { "type": "array", "description": "List of topic coverage records" },
+        "lastSynced": { "type": "string", "description": "ISO timestamp of the last database backup" },
+        "version": { "type": "integer", "description": "Schema synchronization counter" }
+      },
+      "required": ["students", "studentAttendance", "feeRecords", "teacherAttendance", "topicCoverage", "lastSynced", "version"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Registered credentials and privileges for administrative portal accounts."
+    },
+    "/system/state": {
+      "schema": "SchoolState",
+      "description": "Centralized live system database representing all active records."
+    }
+  }
+}

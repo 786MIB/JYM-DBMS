@@ -1,0 +1,18 @@
+{
+  "students": [],
+  "studentAttendance": [],
+  "feeRecords": [],
+  "teacherAttendance": [],
+  "topicCoverage": [],
+  "users": [
+    {
+      "id": "USR-1",
+      "email": "mibrahim.acca@gmail.com",
+      "fullName": "M. Ibrahim",
+      "role": "Admin",
+      "provider": "local"
+    }
+  ],
+  "lastSynced": "2026-06-07T11:20:00.000Z",
+  "version": 1
+}

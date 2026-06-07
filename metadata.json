@@ -1,0 +1,6 @@
+{
+  "name": "JAMIA YAHYA AL MADNI Portal",
+  "description": "Comprehensive administrative database for JAMIA YAHYA AL MADNI tracking student enrollment, daily teacher/student attendance, and month-wise tuition fee collections.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
