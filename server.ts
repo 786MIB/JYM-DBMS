@@ -24,7 +24,7 @@ const PORT = 3000;
 app.use(express.json({ limit: '10mb' }));
 
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
+import { initializeFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
 
 let firebaseConfig: any = null;
 try {
@@ -55,8 +55,10 @@ let firestoreDb: any;
 
 try {
   fbApp = initializeApp(firebaseConfig);
-  firestoreDb = getFirestore(fbApp, dbId);
-  console.log('[Firebase Initializer] Successfully connected and bound to firestoreDB:', dbId);
+  firestoreDb = initializeFirestore(fbApp, {
+    experimentalForceLongPolling: true
+  }, dbId);
+  console.log('[Firebase Initializer] Successfully connected and bound to firestoreDB with long-polling:', dbId);
 } catch (initErr) {
   console.error('[Firebase Initializer] Critical connection binding failure:', initErr);
 }
