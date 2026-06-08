@@ -25,7 +25,28 @@ app.use(express.json({ limit: '10mb' }));
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
-import firebaseConfig from './firebase-applet-config.json';
+
+let firebaseConfig: any = null;
+try {
+  const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
+  if (fs.existsSync(configPath)) {
+    firebaseConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  }
+} catch (e) {
+  console.warn('[Firebase Initializer] Failed to read from cwd, using fallback:', e);
+}
+
+if (!firebaseConfig) {
+  firebaseConfig = {
+    projectId: "synthetic-journal-gnzsc",
+    appId: "1:190259098873:web:14da60e1de6121ca3b1e28",
+    apiKey: "AIzaSyDP8XpXB5U4H06padYqXZuC4fAw4cTrMjA",
+    authDomain: "synthetic-journal-gnzsc.firebaseapp.com",
+    firestoreDatabaseId: "ai-studio-26c58ed8-be08-420c-a9a5-839968f5257c",
+    storageBucket: "synthetic-journal-gnzsc.firebasestorage.app",
+    messagingSenderId: "190259098873"
+  };
+}
 
 const dbId = (firebaseConfig && firebaseConfig.firestoreDatabaseId) || "ai-studio-26c58ed8-be08-420c-a9a5-839968f5257c";
 
