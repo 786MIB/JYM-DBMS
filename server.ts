@@ -25,7 +25,30 @@ app.use(express.json({ limit: '10mb' }));
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
-import firebaseConfig from './firebase-applet-config.json';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+let firebaseConfig: any;
+try {
+  firebaseConfig = require('./firebase-applet-config.json');
+} catch (err) {
+  console.warn('[Firebase Initializer] require of config failed, falling back to FS sync read', err);
+  try {
+    const raw = fs.readFileSync(path.join(process.cwd(), 'firebase-applet-config.json'), 'utf8');
+    firebaseConfig = JSON.parse(raw);
+  } catch (fsErr) {
+    console.error('[Firebase Initializer] filesystem read fallback failed, defaulting to hardcoded standard values', fsErr);
+    firebaseConfig = {
+      projectId: "synthetic-journal-gnzsc",
+      appId: "1:190259098873:web:14da60e1de6121ca3b1e28",
+      apiKey: "AIzaSyDP8XpXB5U4H06padYqXZuC4fAw4cTrMjA",
+      authDomain: "synthetic-journal-gnzsc.firebaseapp.com",
+      firestoreDatabaseId: "ai-studio-26c58ed8-be08-420c-a9a5-839968f5257c",
+      storageBucket: "synthetic-journal-gnzsc.firebasestorage.app",
+      messagingSenderId: "190259098873"
+    };
+  }
+}
 
 const dbId = (firebaseConfig && firebaseConfig.firestoreDatabaseId) || "ai-studio-26c58ed8-be08-420c-a9a5-839968f5257c";
 
