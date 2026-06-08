@@ -24,7 +24,7 @@ const PORT = 3000;
 app.use(express.json({ limit: '10mb' }));
 
 import { initializeApp } from 'firebase/app';
-import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, doc, getDoc, setDoc, collection, getDocs, deleteDoc } from 'firebase/firestore';
 import firebaseConfig from './firebase-applet-config.json';
 
 const dbId = (firebaseConfig && firebaseConfig.firestoreDatabaseId) || "ai-studio-26c58ed8-be08-420c-a9a5-839968f5257c";
@@ -48,15 +48,7 @@ const getInitialDb = (): DbState => {
     feeRecords: [],
     teacherAttendance: [],
     topicCoverage: [],
-    users: [
-      {
-        id: 'USR-1',
-        email: 'mibrahim.acca@gmail.com',
-        fullName: 'M. Ibrahim',
-        role: 'Admin' as StaffRole,
-        provider: 'local' as const
-      }
-    ],
+    users: [],
     lastSynced: new Date().toISOString(),
     version: 1
   };
@@ -92,25 +84,19 @@ const getDbFirestore = async (): Promise<DbState> => {
       usersList.push(u);
     });
 
-    // Automatically ensure main admin is preset and has password set to admin.JYM
+    // Clean up any stale pre-seeded main admin with the default password 'admin.JYM' so the user can recreate it safely in signup
     const adminIndex = usersList.findIndex(u => u.email.toLowerCase() === 'mibrahim.acca@gmail.com');
     if (adminIndex !== -1) {
       const existingAdmin = usersList[adminIndex];
-      if (existingAdmin.password !== 'admin.JYM') {
-        existingAdmin.password = 'admin.JYM';
-        await setDoc(doc(firestoreDb, 'users', existingAdmin.email.toLowerCase()), existingAdmin);
+      if (existingAdmin.password === 'admin.JYM') {
+        try {
+          await deleteDoc(doc(firestoreDb, 'users', 'mibrahim.acca@gmail.com'));
+          usersList.splice(adminIndex, 1);
+          console.log('[Firebase Initializer] Deleted stale pre-seeded default admin user to allow clean signup');
+        } catch (delErr) {
+          console.error('[Firebase Initializer] Failed to delete stale/pre-seeded user:', delErr);
+        }
       }
-    } else {
-      const adminUser: LocalUser = {
-        id: 'USR-1',
-        email: 'mibrahim.acca@gmail.com',
-        fullName: 'M. Ibrahim',
-        role: 'Admin' as StaffRole,
-        provider: 'local' as const,
-        password: 'admin.JYM'
-      };
-      await setDoc(doc(firestoreDb, 'users', adminUser.email.toLowerCase()), adminUser);
-      usersList.push(adminUser);
     }
 
     return {
@@ -238,15 +224,6 @@ app.post('/api/auth/signup', async (req, res) => {
     const existing = db.users.find(u => u.email.toLowerCase() === email.toLowerCase());
 
     if (existing) {
-      if (email.toLowerCase() === 'mibrahim.acca@gmail.com') {
-        // Special case: allow the pre-seeded admin to sign up and update/set their custom password & details
-        existing.password = password || '';
-        if (fullName) {
-          existing.fullName = fullName;
-        }
-        await saveDbFirestore(db);
-        return res.json({ user: existing });
-      }
       return res.status(400).json({ error: 'This email is already registered. Please login.' });
     }
 
