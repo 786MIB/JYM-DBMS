@@ -111,7 +111,13 @@ export default function App() {
     try {
       const res = await fetch('/api/db');
       if (res.ok) {
-        const serverDb = await res.json() as DbState;
+        const text = await res.text();
+        let serverDb: DbState;
+        try {
+          serverDb = JSON.parse(text) as DbState;
+        } catch {
+          throw new Error("Unable to parse database state response as JSON.");
+        }
         setDb(serverDb);
         localStorage.setItem('JAMIA_YAHYA_AL_MADNI_DB_CACHE', JSON.stringify(serverDb));
         setSyncStatus('synced');
@@ -136,7 +142,13 @@ export default function App() {
         body: JSON.stringify(targetDb)
       });
       if (res.ok) {
-        const savedDb = await res.json() as DbState;
+        const text = await res.text();
+        let savedDb: DbState;
+        try {
+          savedDb = JSON.parse(text) as DbState;
+        } catch {
+          throw new Error("Unable to parse sync state response as JSON.");
+        }
         setDb(savedDb);
         localStorage.setItem('JAMIA_YAHYA_AL_MADNI_DB_CACHE', JSON.stringify(savedDb));
         setSyncStatus('synced');
@@ -317,14 +329,19 @@ export default function App() {
         newRole
       })
     });
+    const text = await res.text();
+    let data: any = {};
+    try {
+      data = JSON.parse(text);
+    } catch {
+      throw new Error(`Invalid response received from server during role update (Status: ${res.status}).`);
+    }
     if (res.ok) {
-      const data = await res.json();
       setDb(prev => ({
         ...prev,
         users: data.users
       }));
     } else {
-      const data = await res.json();
       throw new Error(data.error || 'Failed to update user role');
     }
   };

@@ -38,7 +38,14 @@ export const LoginSignupPanel: React.FC<LoginSignupPanelProps> = ({ onLoginSucce
         }),
       });
 
-      const data = await response.json();
+      const resText = await response.text();
+      let data: any = {};
+      try {
+        data = JSON.parse(resText);
+      } catch (parseError) {
+        throw new Error(`Server returned non-JSON error page (Status: ${response.status}). Details: ${resText.slice(0, 150)}`);
+      }
+
       if (!response.ok) {
         throw new Error(data.error || 'Authentication failed');
       }

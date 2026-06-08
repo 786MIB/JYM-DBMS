@@ -26,10 +26,50 @@ app.use(express.json({ limit: '10mb' }));
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
-import firebaseConfig from './firebase-applet-config.json';
 
-const fbApp = initializeApp(firebaseConfig);
-const firestoreDb = getFirestore(fbApp, firebaseConfig.firestoreDatabaseId);
+// Robust multi-path config loader supporting both local dev and serverless/Vercel ESM environments perfectly without assertions
+import { createRequire } from 'module';
+
+let firebaseConfig: any = null;
+
+try {
+  const requireModule = createRequire(import.meta.url);
+  firebaseConfig = requireModule('./firebase-applet-config.json');
+} catch (err) {
+  console.log('[Firebase Initializer] createRequire failed, trying fs fallback:', err);
+  try {
+    const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
+    if (fs.existsSync(configPath)) {
+      firebaseConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+    } else {
+      firebaseConfig = JSON.parse(fs.readFileSync('./firebase-applet-config.json', 'utf8'));
+    }
+  } catch (fsErr) {
+    console.error('[Firebase Initializer] File system read failed directly. Using safe default recovery payload:', fsErr);
+    firebaseConfig = {
+      projectId: "synthetic-journal-gnzsc",
+      appId: "1:190259098873:web:14da60e1de6121ca3b1e28",
+      apiKey: "AIzaSyDP8XpXB5U4H06padYqXZuC4fAw4cTrMjA",
+      authDomain: "synthetic-journal-gnzsc.firebaseapp.com",
+      firestoreDatabaseId: "ai-studio-26c58ed8-be08-420c-a9a5-839968f5257c",
+      storageBucket: "synthetic-journal-gnzsc.firebasestorage.app",
+      messagingSenderId: "190259098873"
+    };
+  }
+}
+
+const dbId = (firebaseConfig && firebaseConfig.firestoreDatabaseId) || "ai-studio-26c58ed8-be08-420c-a9a5-839968f5257c";
+
+let fbApp: any;
+let firestoreDb: any;
+
+try {
+  fbApp = initializeApp(firebaseConfig);
+  firestoreDb = getFirestore(fbApp, dbId);
+  console.log('[Firebase Initializer] Successfully connected and bound to firestoreDB:', dbId);
+} catch (initErr) {
+  console.error('[Firebase Initializer] Critical connection binding failure:', initErr);
+}
 
 // Helper to create DB Dir and seed database if it doesn't exist
 const getInitialDb = (): DbState => {

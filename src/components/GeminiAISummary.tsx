@@ -27,11 +27,18 @@ export const GeminiAISummary: React.FC<GeminiAIProps> = ({ activeRole, lang }) =
         body: JSON.stringify({ lang }),
       });
 
-      if (!res.ok) {
-        throw new Error('API server returned status failure on AI generation.');
+      const resText = await res.text();
+      let data: any = {};
+      try {
+        data = JSON.parse(resText);
+      } catch {
+        throw new Error(`API server returned an invalid response (non-JSON). Status: ${res.status}. Details: ${resText.slice(0, 150)}`);
       }
 
-      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || 'API server returned status failure on AI generation.');
+      }
+
       if (data.error) {
         throw new Error(data.error);
       }
