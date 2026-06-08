@@ -1,7 +1,6 @@
 import express from 'express';
 import path from 'path';
 import fs from 'fs';
-import { createServer as createViteServer } from 'vite';
 import { GoogleGenAI } from '@google/genai';
 import { DbState, Student, StudentAttendance, FeeRecord, TeacherAttendance, TopicCoverage, StaffRole, LocalUser } from './src/types';
 
@@ -26,37 +25,7 @@ app.use(express.json({ limit: '10mb' }));
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
-
-// Robust multi-path config loader supporting both local dev and serverless/Vercel ESM environments perfectly without assertions
-import { createRequire } from 'module';
-
-let firebaseConfig: any = null;
-
-try {
-  const requireModule = createRequire(import.meta.url);
-  firebaseConfig = requireModule('./firebase-applet-config.json');
-} catch (err) {
-  console.log('[Firebase Initializer] createRequire failed, trying fs fallback:', err);
-  try {
-    const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
-    if (fs.existsSync(configPath)) {
-      firebaseConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-    } else {
-      firebaseConfig = JSON.parse(fs.readFileSync('./firebase-applet-config.json', 'utf8'));
-    }
-  } catch (fsErr) {
-    console.error('[Firebase Initializer] File system read failed directly. Using safe default recovery payload:', fsErr);
-    firebaseConfig = {
-      projectId: "synthetic-journal-gnzsc",
-      appId: "1:190259098873:web:14da60e1de6121ca3b1e28",
-      apiKey: "AIzaSyDP8XpXB5U4H06padYqXZuC4fAw4cTrMjA",
-      authDomain: "synthetic-journal-gnzsc.firebaseapp.com",
-      firestoreDatabaseId: "ai-studio-26c58ed8-be08-420c-a9a5-839968f5257c",
-      storageBucket: "synthetic-journal-gnzsc.firebasestorage.app",
-      messagingSenderId: "190259098873"
-    };
-  }
-}
+import firebaseConfig from './firebase-applet-config.json';
 
 const dbId = (firebaseConfig && firebaseConfig.firestoreDatabaseId) || "ai-studio-26c58ed8-be08-420c-a9a5-839968f5257c";
 
@@ -987,6 +956,7 @@ Financial Collections represent **${currencyLabel}${totalFeesCollected} collecte
 // Serve frontend build static files in production as requested in server middleware requirements
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
