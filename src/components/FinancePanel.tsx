@@ -35,7 +35,7 @@ export const FinancePanel: React.FC<FinanceProps> = ({
   lang
 }) => {
   const [searchTerm, setSearchTerm] = useState('');
-  const currSymbol = lang === 'ur' ? 'PKR ' : '$';
+  const currSymbol = 'PKR ';
   const [statusFilter, setStatusFilter] = useState('All');
   
   // State for Billing / Charging All Students Bulk Form
@@ -319,7 +319,7 @@ export const FinancePanel: React.FC<FinanceProps> = ({
             
             <div className="space-y-1">
               <label className="text-xs font-semibold text-slate-600">
-                {lang === 'ur' ? 'مقررہ رقم (PKR)' : 'Standard Charge Amount ($)'}
+                {lang === 'ur' ? 'مقررہ رقم (PKR)' : 'Standard Charge Amount (PKR)'}
               </label>
               <input
                 id="billing-amount"
@@ -663,7 +663,7 @@ export const FinancePanel: React.FC<FinanceProps> = ({
             {/* Tuition Dues Amount */}
             <div className="space-y-1">
               <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                {lang === 'ur' ? 'مقررہ رقم (PKR)' : 'Standard Amount Due ($)'}
+                {lang === 'ur' ? 'مقررہ رقم (PKR)' : 'Standard Amount Due (PKR)'}
               </label>
               <input
                 type="number"
@@ -680,7 +680,7 @@ export const FinancePanel: React.FC<FinanceProps> = ({
             <div className="space-y-1">
               <div className="flex justify-between items-center">
                 <label className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-                  {lang === 'ur' ? 'وصول کردہ رقم (PKR)' : 'Amount Collected ($)'}
+                  {lang === 'ur' ? 'وصول کردہ رقم (PKR)' : 'Amount Collected (PKR)'}
                 </label>
                 {canEdit && (
                   <button

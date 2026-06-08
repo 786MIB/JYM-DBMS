@@ -254,7 +254,7 @@ export const DashboardPanel: React.FC<DashboardProps> = ({
               <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{translations[lang].tuitionFeeCollections}</p>
               <h3 className="text-2xl font-bold font-serif text-slate-800 mt-1">{financialOverview.percentage}%</h3>
               <p className="text-xs text-slate-500 mt-2 flex items-center gap-1">
-                <span className="text-emerald-600 font-medium font-mono">${financialOverview.collected}</span> {translations[lang].fundsCollectedOf} ${financialOverview.due}
+                <span className="text-emerald-600 font-medium font-mono">PKR {financialOverview.collected}</span> {translations[lang].fundsCollectedOf} PKR {financialOverview.due}
               </p>
             </div>
             <div className={`p-3 rounded-lg bg-amber-50 text-amber-700 group-hover:bg-amber-100 transition-colors ${lang === 'ur' ? 'mr-auto' : 'ml-auto'}`}>

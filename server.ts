@@ -26,9 +26,8 @@ app.use(express.json({ limit: '10mb' }));
 
 import { initializeApp } from 'firebase/app';
 import { getFirestore, doc, getDoc, setDoc, collection, getDocs } from 'firebase/firestore';
+import firebaseConfig from './firebase-applet-config.json';
 
-// Load Firebase Config safely from JSON
-const firebaseConfig = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'firebase-applet-config.json'), 'utf8'));
 const fbApp = initializeApp(firebaseConfig);
 const firestoreDb = getFirestore(fbApp, firebaseConfig.firestoreDatabaseId);
 
@@ -829,7 +828,7 @@ app.post('/api/reports/generate-ai-summary', async (req, res) => {
   try {
     const db = await getDbFirestore();
     const lang = req.body.lang || 'en';
-    const currencyLabel = lang === 'ur' ? 'PKR ' : '$';
+    const currencyLabel = 'PKR ';
     
     // Summary values
     const totalStudents = db.students.length;
@@ -966,4 +965,8 @@ async function startServer() {
   });
 }
 
-startServer();
+if (!process.env.VERCEL) {
+  startServer();
+}
+
+export default app;
